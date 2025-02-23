@@ -1,0 +1,29 @@
+curl -X POST http://localhost/api/user/ \
+-H "Content-Type: application/json" \
+-d '{
+  "firstname": "Noé",
+  "lastname": "Lamarque",
+  "birthdate": "2004-05-23",
+  "email": "lamarquenoe@gmail.com",
+  "tel": "0782953025",
+  "password": "12345678",
+  "civility": "Mr",
+  "note": "Test",
+  "handicap": 1,
+  "googleUUID": "QZc8mk3YpfcYRhZ2o9VNG96IAQs1"
+}'
+
+curl -X POST http://localhost/api/user/ \
+-H "Content-Type: application/json" \
+-d '{
+  "firstname": "Marius",
+  "lastname": "Mabulu",
+  "birthdate": "2003-05-23",
+  "email": "mabulumarius@gmail.com",
+  "tel": "0123456789",
+  "password": "12345678",
+  "civility": "Mr",
+  "note": "Test",
+  "handicap": 2,
+  "googleUUID": "VnxtCUd1teRhOvRkaWKFnndKcPq1"
+}'

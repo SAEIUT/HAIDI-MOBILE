@@ -1,0 +1,9 @@
+curl -X POST http://localhost:8001/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Marius Mabulu",
+  "email": "marius999@gmail.com",
+  "password": "securepassword",
+  "lieu": "Courbevoie",
+  "tel": "0123456789"
+}'

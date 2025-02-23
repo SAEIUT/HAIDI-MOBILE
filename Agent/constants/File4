@@ -1,0 +1,59 @@
+curl -X POST http://localhost:8004/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Noe Lamarque",
+  "email": "noe@example.com",
+  "password": "12345678",
+  "lieu": "Courbevoie",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "noe@example.com",
+  "entreprise": "RATP",
+  "password": "12345678",
+  "googleUUID": "XRwKu3I258PDuLYlSI5CgwNl8tU2",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost:8003/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Damien Sabau",
+  "email": "damien@example.com",
+  "password": "12345678",
+  "lieu": "ORY",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "damien@example.com",
+  "entreprise": "AF",
+  "password": "12345678",
+  "googleUUID": "ZibM6oIIXYVLrhORZlGkw7vpBgV2",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost:8001/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Marius Mabulu",
+  "email": "marius@example.com",
+  "password": "12345678",
+  "lieu": "Gare de Lyon",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "marius@example.com",
+  "entreprise": "SNCF",
+  "password": "12345678",
+  "googleUUID": "dzyhmA6ljhSs688euzTxGaSa7Z63",
+  "tel": "0123456789"
+}'

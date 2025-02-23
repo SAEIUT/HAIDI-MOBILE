@@ -1,0 +1,9 @@
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "marius999@gmail.com",
+  "entreprise": "SNCF",
+  "password": "mypassword",
+  "googleUUID": "tRVfuKpsgrgaLYC5YaYwjplzgAl1",
+  "tel": "0123456789"
+}'
