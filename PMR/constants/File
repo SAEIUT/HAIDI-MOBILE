@@ -1,0 +1,234 @@
+curl -X POST http://localhost/api/user/ \               
+-H "Content-Type: application/json" \
+-d '{
+  "firstname": "Noé",
+  "lastname": "Lamarque",
+  "birthdate": "2004-05-23",
+  "email": "lamarquenoe@gmail.com",
+  "tel": "0782953025",
+  "password": "12345678",
+  "civility": "Mr",
+  "note": "Test",
+  "handicap": 1,
+  "googleUUID": "QZc8mk3YpfcYRhZ2o9VNG96IAQs1"
+}'
+
+curl -X POST http://localhost/api/user/ \               
+-H "Content-Type: application/json" \
+-d '{
+  "firstname": "Marius",
+  "lastname": "Mabulu",
+  "birthdate": "2003-05-23",
+  "email": "mabulumarius@gmail.com",
+  "tel": "0123456789",
+  "password": "12345678",
+  "civility": "Mr",
+  "note": "Test",
+  "handicap": 2,
+  "googleUUID": "VnxtCUd1teRhOvRkaWKFnndKcPq1"
+}'
+
+curl -X POST http://localhost/api/reservation/ \
+-H "Content-Type: application/json" \
+-d '{
+  "idDossier": 4321,
+  "idPMR": 1,
+  "googleId": "QZc8mk3YpfcYRhZ2o9VNG96IAQs1",
+  "enregistre": true,
+  "sousTrajets": [
+    {
+      "BD": "SNCF",
+      "numDossier": 1234,
+      "departure": "Courbevoie",
+      "arrival": "CDG",
+      "departureTime": "2024-12-23T03:25:44",
+      "arrivalTime": "2024-12-24T04:25:44",
+      "statusValue": 0
+    },
+    {
+      "BD": "SNCF",
+      "numDossier": 5678,
+      "departure": "CDG",
+      "arrival": "Courbevoie",
+      "departureTime": "2024-12-23T05:25:44",
+      "arrivalTime": "2024-12-24T06:25:44",
+      "statusValue": 0
+    }
+  ],
+  "bagage": {
+    "bagagesList": [1111, 2222],
+    "specialBagage": ""
+  },
+  "specialAssistance": {
+    "wheelchair": false,
+    "visualAssistance": false,
+    "hearingAssistance": false,
+    "otherAssistance": ""
+  },
+  "security": {
+    "validDocuments": false,
+    "documentsExpiry": "",
+    "dangerousItems": [],
+    "liquidVolume": "",
+    "medicalEquipment": "",
+    "securityQuestions": {
+      "packedOwn": false,
+      "leftUnattended": false,
+      "acceptedItems": false,
+      "receivedItems": false,
+      "dangerousGoods": false
+    },
+    "declarations": {
+      "weaponsFirearms": false,
+      "explosives": false,
+      "flammableMaterials": false,
+      "radioactiveMaterials": false,
+      "toxicSubstances": false,
+      "compressedGases": false,
+      "illegalDrugs": false
+    }
+  },
+  "additionalInfo": {
+    "emergencyContact": "",
+    "medicalInfo": "",
+    "dietaryRestrictions": ""
+  }
+}'
+
+curl -X POST http://localhost/api/reservation/ \
+-H "Content-Type: application/json" \
+-d '{
+  "idDossier": 1234,
+  "idPMR": 2,
+  "googleId": "VnxtCUd1teRhOvRkaWKFnndKcPq1",
+  "enregistre": true,
+  "sousTrajets": [
+    {
+      "BD": "RATP",
+      "numDossier": 1111,
+      "departure": "Courbevoie",
+      "arrival": "Gare de Lyon",
+      "departureTime": "2024-12-23T08:25:44",
+      "arrivalTime": "2024-12-24T09:25:44",
+      "statusValue": 0
+    },
+    {
+      "BD": "SNCF",
+      "numDossier": 2222,
+      "departure": "Gare de Lyon",
+      "arrival": "ORY",
+      "departureTime": "2024-12-23T10:25:44",
+      "arrivalTime": "2024-12-24T11:25:44",
+      "statusValue": 0
+    },
+    {
+      "BD": "AF",
+      "numDossier": 3333,
+      "departure": "ORY",
+      "arrival": "MRS",
+      "departureTime": "2025-12-23T12:25:44",
+      "arrivalTime": "2024-12-24T14:25:44",
+      "statusValue": 0
+    }
+  ],
+  "bagage": {
+    "bagagesList": [1234, 4321],
+    "specialBagage": ""
+  },
+  "specialAssistance": {
+    "wheelchair": false,
+    "visualAssistance": false,
+    "hearingAssistance": false,
+    "otherAssistance": ""
+  },
+  "security": {
+    "validDocuments": false,
+    "documentsExpiry": "",
+    "dangerousItems": [],
+    "liquidVolume": "",
+    "medicalEquipment": "",
+    "securityQuestions": {
+      "packedOwn": false,
+      "leftUnattended": false,
+      "acceptedItems": false,
+      "receivedItems": false,
+      "dangerousGoods": false
+    },
+    "declarations": {
+      "weaponsFirearms": false,
+      "explosives": false,
+      "flammableMaterials": false,
+      "radioactiveMaterials": false,
+      "toxicSubstances": false,
+      "compressedGases": false,
+      "illegalDrugs": false
+    }
+  },
+  "additionalInfo": {
+    "emergencyContact": "",
+    "medicalInfo": "",
+    "dietaryRestrictions": ""
+  }
+}'
+
+curl -X POST http://localhost:8004/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Noe Lamarque",
+  "email": "noe@example.com",
+  "password": "12345678",
+  "lieu": "Courbevoie",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "noe@example.com",
+  "entreprise": "RATP",
+  "password": "12345678",
+  "googleUUID": "XRwKu3I258PDuLYlSI5CgwNl8tU2",
+  "tel": "0123456789"
+}'
+
+
+curl -X POST http://localhost:8003/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Damien Sabau",
+  "email": "damien@example.com",
+  "password": "12345678",
+  "lieu": "ORY",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "damien@example.com",
+  "entreprise": "AF",
+  "password": "12345678",
+  "googleUUID": "ZibM6oIIXYVLrhORZlGkw7vpBgV2",
+  "tel": "0123456789"
+}'
+
+
+curl -X POST http://localhost:8001/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Marius Mabulu",
+  "email": "marius@example.com",
+  "password": "12345678",
+  "lieu": "Gare de Lyon",
+  "tel": "0123456789"
+}'
+
+curl -X POST http://localhost/api/agent \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "marius@example.com",
+  "entreprise": "SNCF",
+  "password": "12345678",
+  "googleUUID": "dzyhmA6ljhSs688euzTxGaSa7Z63",
+  "tel": "0123456789"
+}'

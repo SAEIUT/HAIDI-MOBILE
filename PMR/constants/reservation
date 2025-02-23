@@ -1,0 +1,133 @@
+curl -X POST http://localhost/api/reservation/ \
+-H "Content-Type: application/json" \
+-d '{
+  "idDossier": 4321,
+  "idPMR": 2,
+  "googleId": "cVaMpLObnshrmZjL4mHVSpxwhyV2",
+  "enregistre": false,
+  "sousTrajets": [
+    {
+      "BD": "SNCF",
+      "numDossier": 1234,
+      "departure": "Courbevoie",
+      "arrival": "CDG",
+      "departureTime": "2024-12-23T03:25:44",
+      "arrivalTime": "2024-12-24T04:25:44",
+      "statusValue": 0
+    },
+    {
+      "BD": "SNCF",
+      "numDossier": 4444,
+      "departure": "CDG",
+      "arrival": "Courbevoie",
+      "departureTime": "2024-12-23T03:25:44",
+      "arrivalTime": "2024-12-24T04:25:44",
+      "statusValue": 0
+    }
+  ],
+  "bagage": {
+    "bagagesList": [1234, 4321],
+    "specialBagage": ""
+  },
+  "specialAssistance": {
+    "wheelchair": false,
+    "visualAssistance": false,
+    "hearingAssistance": false,
+    "otherAssistance": ""
+  },
+  "security": {
+    "validDocuments": false,
+    "documentsExpiry": "",
+    "dangerousItems": [],
+    "liquidVolume": "",
+    "medicalEquipment": "",
+    "securityQuestions": {
+      "packedOwn": false,
+      "leftUnattended": false,
+      "acceptedItems": false,
+      "receivedItems": false,
+      "dangerousGoods": false
+    },
+    "declarations": {
+      "weaponsFirearms": false,
+      "explosives": false,
+      "flammableMaterials": false,
+      "radioactiveMaterials": false,
+      "toxicSubstances": false,
+      "compressedGases": false,
+      "illegalDrugs": false
+    }
+  },
+  "additionalInfo": {
+    "emergencyContact": "",
+    "medicalInfo": "",
+    "dietaryRestrictions": ""
+  }
+}'
+
+curl -X POST http://localhost/api/reservation/ \
+-H "Content-Type: application/json" \
+-d '{
+  "idDossier": 1234,
+  "idPMR": 5678,
+  "googleId": "abcdefg",
+  "enregistre": false,
+  "sousTrajets": [
+    {
+      "BD": "SNCF",
+      "numDossier": 1111,
+      "departure": "Courbevoie",
+      "arrival": "Saint Lazare",
+      "departureTime": "2024-12-23T03:25:44",
+      "arrivalTime": "2024-12-24T04:25:44",
+      "statusValue": 0
+    },
+    {
+      "BD": "SNCF",
+      "numDossier": 2222,
+      "departure": "Vitry",
+      "arrival": "Courbevoie",
+      "departureTime": "2024-12-23T03:25:44",
+      "arrivalTime": "2024-12-24T04:25:44",
+      "statusValue": 0
+    }
+  ],
+  "bagage": {
+    "bagagesList": [1234, 4321],
+    "specialBagage": ""
+  },
+  "specialAssistance": {
+    "wheelchair": false,
+    "visualAssistance": false,
+    "hearingAssistance": false,
+    "otherAssistance": ""
+  },
+  "security": {
+    "validDocuments": false,
+    "documentsExpiry": "",
+    "dangerousItems": [],
+    "liquidVolume": "",
+    "medicalEquipment": "",
+    "securityQuestions": {
+      "packedOwn": false,
+      "leftUnattended": false,
+      "acceptedItems": false,
+      "receivedItems": false,
+      "dangerousGoods": false
+    },
+    "declarations": {
+      "weaponsFirearms": false,
+      "explosives": false,
+      "flammableMaterials": false,
+      "radioactiveMaterials": false,
+      "toxicSubstances": false,
+      "compressedGases": false,
+      "illegalDrugs": false
+    }
+  },
+  "additionalInfo": {
+    "emergencyContact": "",
+    "medicalInfo": "",
+    "dietaryRestrictions": ""
+  }
+}'

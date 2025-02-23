@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "telephone",
+    "slug": "telephone",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/CMF_1.gif",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/CMF_1.webp",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "L'application nécessite l'accès à la caméra pour scanner votre carte d'identité.",
+        "NSPhotoLibraryUsageDescription": "L'application nécessite l'accès à vos photos pour sauvegarder les photos prises.",
+        "NSMicrophoneUsageDescription": "L'application n'utilise pas le microphone"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.anonymous.telephone"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-build-properties",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "L'application nécessite l'accès à la caméra pour scanner votre carte d'identité.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "L'application nécessite l'accès à vos photos."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
