@@ -8,8 +8,8 @@ const EditProfile = ({ editedProfile, onChange, onSave, onCancel }) => {
         <Text style={styles.label}>Prénom</Text>
         <TextInput
           style={styles.input}
-          value={editedProfile.firstname}
-          onChangeText={(text) => onChange({ ...editedProfile, firstname: text })}
+          value={editedProfile.firstName}
+          onChangeText={(text) => onChange({ ...editedProfile, firstName: text })}
           placeholder="Entrez votre prénom"
           placeholderTextColor="#888"
         />
@@ -19,8 +19,8 @@ const EditProfile = ({ editedProfile, onChange, onSave, onCancel }) => {
         <Text style={styles.label}>Nom</Text>
         <TextInput
           style={styles.input}
-          value={editedProfile.lastname}
-          onChangeText={(text) => onChange({ ...editedProfile, lastname: text })}
+          value={editedProfile.lastName}
+          onChangeText={(text) => onChange({ ...editedProfile, lastName: text })}
           placeholder="Entrez votre nom"
           placeholderTextColor="#888"
         />

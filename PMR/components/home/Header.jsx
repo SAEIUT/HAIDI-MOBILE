@@ -24,15 +24,15 @@ export default function Header() {
     const getUserUid = async () => {
       try {
         const storedUid = await AsyncStorage.getItem('userUid');
-        console.log("UID récupéré :", storedUid);
+        // console.log("UID récupéré :", storedUid);
         if (storedUid) {
           setUserUid(storedUid);
         } else {
-          console.log("Pas d'UID, redirection vers connexion.");
+          // console.log("Pas d'UID, redirection vers connexion.");
           navigation.replace("/Login");
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'UID :", error);
+        // console.error("Erreur lors de la récupération de l'UID :", error);
       }
     };
   
@@ -47,19 +47,19 @@ export default function Header() {
     const fetchCurrentUser = async () => {
       setPending(true);
       try {
-        console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
+        // console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
         const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${userUid}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
   
         const data = await response.json();
-        console.log("Données utilisateur reçues :", data);
+        // console.log("Données utilisateur reçues :", data);
   
         if (response.ok) {
           setUser(data.user);
         } else {
-          console.log("Erreur API:", data.error);
+          // console.log("Erreur API:", data.error);
           navigation.replace("/Login");
         }
       } catch (error) {

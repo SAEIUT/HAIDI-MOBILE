@@ -421,7 +421,7 @@ export default function Register() {
     setIsLoading(true);
   
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/user/sign-up`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/sign-up`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
