@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PhotoContext } from '../Photos/PhotoContext2';
 import EditProfile from './EditProfile';
 import { API_CONFIG } from '../../constants/API_CONFIG';
+import Profil from '../home/Profil';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState(null);
@@ -33,24 +34,37 @@ const ProfileScreen = () => {
 
         // Charger le profil utilisateur
         const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${storedUid}`);
+        const response2 = await fetch(`${API_CONFIG.BASE_URL}/user/byGoogleID/${storedUid}`);
+
+
         if (!response.ok) {
           Alert.alert('Erreur', 'Impossible de récupérer les données utilisateur.');
           return;
         }
 
         const responseData = await response.json();
-        setId(responseData.id);
+        const responseData2 = await response2.json();
+
+        console.log("Modification MongoDB :", responseData2);
+        console.log("Modification Firebase :", responseData);
+        setId(responseData2.id);
+
+        // console.log("id qu'on veut " , id);
         setProfile({
-          firstName: responseData.user.firstName,
-          lastName: responseData.user.lastName,
-          email: responseData.user.Email,
+          firstName: responseData.user.firstName || responseData.user.firstname ,
+          lastName: responseData.user.lastName || responseData.user.lastname,
+          email: responseData.user.Email || responseData.user.email,
           tel: responseData.user.Tel,
         });
 
+        
+        console.log("mes jeux des données : " , responseData);
+        console.log("Prénom :", responseData.user.firstname);
+
         setEditedProfile({
-          firstName: responseData.user.firstName,
-          lastName: responseData.user.lastName,
-          email: responseData.user.Email,
+          firstName: responseData.user.firstName || responseData.user.firstname ,
+          lastName: responseData.user.lastName || responseData.user.lastname,
+          email: responseData.user.Email || responseData.user.email,
           tel: responseData.user.Tel,
           password: '',
         });
@@ -64,23 +78,40 @@ const ProfileScreen = () => {
     fetchUserProfile();
   }, []);
 
+  // console.log("le profil de l'utilisateur : ", profile);
+  console.log("le editprofil de l'utilisateur : ", editedProfile);
+
   // Mettre à jour le profil utilisateur
   const handleSaveProfile = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/user/${id}`, {
+      // Mise à jour du profil dans la base MongoDB
+      const response = await fetch(`${API_CONFIG.BASE_URL}/user/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editedProfile),
+      });
+  
+      // Mise à jour du profil dans Firebase
+      const response2 = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${userID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editedProfile),
       });
-
-      if (!response.ok) throw new Error('Erreur lors de la mise à jour.');
+  
+      // Vérification que les deux mises à jour se sont bien déroulées
+      if (!response.ok || !response2.ok) {
+        throw new Error('Erreur lors de la mise à jour.');
+      }
+  
       Alert.alert('Succès', 'Profil mis à jour.');
       setProfile(editedProfile);
       setIsEditing(false);
     } catch (error) {
+      console.error('Erreur lors de la mise à jour du profil :', error);
       Alert.alert('Erreur', 'Impossible de mettre à jour le profil.');
     }
   };
+  
 
   // Supprimer le compte utilisateur
   const handleDeleteProfile = async () => {

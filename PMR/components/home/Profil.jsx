@@ -50,12 +50,13 @@ export default function Profil() {
         });
   
         const data = await response.json();
-        // console.log("Données utilisateur reçues :", data);
+        // console.log("Données utilisateur reçues :", data.user);
   
         if (response.ok) {
           setUser(data.user);
+          console.log("je fais user : ", user);
         } else {
-          // console.log("Erreur API:", data.error);
+          console.log("Erreur API:", data.error);
           navigation.replace("/Login");
         }
       } catch (error) {
@@ -71,7 +72,7 @@ export default function Profil() {
   return (
     <View style={styles.container}>
       <Text style={styles.status}>Profil</Text>
-      <Text>{user ? `Bienvenue ${user.firstName}` : "Chargement..."}</Text>
+      <Text>{user ? `Bienvenue ${user.firstName || user.firstname}` : "Chargement..."}</Text>
 
       {pending && (
         <View style={styles.pending}>
@@ -87,8 +88,8 @@ export default function Profil() {
             </View>
             <View style={styles.ConText}>
               <Text style={styles.Text1}>Bienvenue,</Text>
-              {user && user.firstName && (
-                <Text style={styles.Text2}> {user.firstName} 👋</Text>
+              {user && user.firstName  && (
+                <Text style={styles.Text2}> {user.firstName || user.firstname} 👋</Text>
               )}
             </View>
             <View style={styles.OnGoing}>

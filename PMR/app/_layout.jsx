@@ -12,8 +12,10 @@ export default function RootLayout() {
         {/* Groupe des onglets */}
         <Stack.Screen name="(TabBar)" options={{ headerShown: false }} />
 
-        <Stack.Screen name="cgu" options={{ headerShown: false }}
-      />
+        <Stack.Screen name="cgu" options={{ headerShown: false }}/>
+
+        <Stack.Screen name="servives" options={{ headerShown: false }}/>
+
       </Stack>
     </PhotoProvider>
   );
