@@ -34,7 +34,7 @@ export const ProfileProvider = ({ children }) => {
       await SecureStore.setItemAsync(PROFILE_IMAGE_KEY, newPath); // Sauvegarder le chemin
       setProfileImage({ uri: newPath }); // Mettre à jour l'état
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de l\'image :', error);
+      // console.error('Erreur lors de la sauvegarde de l\'image :', error);
     }
   };
 

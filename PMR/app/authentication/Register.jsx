@@ -301,107 +301,6 @@ export default function Register() {
   };
 
   // Fonction pour gérer l'inscription
-  const handleRegister2 = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 8 caractères.');
-      return;
-    }
-
-    if (!firstName || !lastName || !age || !email || !password || !birthdate || !civility || civility === "" || !tel) {
-      Alert.alert('Erreur', 'Tous les champs sont obligatoires !');
-      return;
-    }
-
-    if (hasAccompagnateur) {
-      const { firstName, lastName, age, birthdate, civility } = accompagnateurInfo;
-      if (!firstName || !lastName || !age || !birthdate || !civility || civility === "") {
-        Alert.alert('Erreur', 'Tous les champs de l\'accompagnateur sont obligatoires !');
-        return;
-      }
-    }
-
-    try {
-      // const salt = bcrypt.genSaltSync(10);
-      // const hashedPassword = bcrypt.hashSync(password, salt);
-
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const accompagnateurData = hasAccompagnateur ? {
-        firstName: accompagnateurInfo.firstName,
-        lastName: accompagnateurInfo.lastName,
-        age: parseInt(accompagnateurInfo.age),
-        birthdate: formatISOBirthdate(accompagnateurInfo.birthdate),
-        civility: accompagnateurInfo.civility
-      } : null;
-
-      const userDocRef = doc(db, 'users', user.uid);
-      await setDoc(userDocRef, {
-        firstName: firstName,
-        lastName: lastName,
-        Age: parseInt(age),
-        Email: email,
-        Birthdate: birthdate,
-        Civility: civility,
-        Tel: tel,
-        Note: note,
-        Handicaps: {
-          visuel: handicaps.visuel,
-          auditif: handicaps.auditif,
-          moteur: handicaps.moteur,
-          mental: handicaps.mental,
-          autre: handicaps.autre,
-          autreHandicap: handicaps.autre ? autreHandicap : null,
-        },
-        Accompagnateur: accompagnateurData,
-      });
-
-      try {
-        const response = await fetch(`http://${API_CONFIG.ipaddress}/api/user`, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            'Content-Type': "application/json",
-          },
-          body: JSON.stringify({
-            firstname: firstName,
-            lastname: lastName,
-            birthdate: formatISOBirthdate(birthdate),
-            email,
-            tel,
-            password,
-            civility,
-            note,
-            handicap: 1,
-            googleUUID: user.uid,
-          })
-        });
-
-        if (!response.ok) {
-          console.error(`Failed with status ${response.status}: ${response.statusText}: ${response.body}`);
-        }
-        else {
-          console.log(`Data sent successfully to API:`);
-        }
-      }
-      catch (error) {
-        console.error(`Error sending data to API:`, error.message);
-      }
-
-      console.log('Utilisateur enregistré avec succès et ajouté à Firestore !');
-      alert('Inscription réussie !');
-      router.push('./Login');
-    } catch (error) {
-      console.error("Erreur lors de l'inscription :", error.message);
-      Alert.alert('Erreur', error.message);
-    }
-  };
-
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
@@ -421,7 +320,8 @@ export default function Register() {
     setIsLoading(true);
   
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/user/sign-up`, {
+      // Appel pour l'inscription via Firebase
+      const firebaseResponse = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/sign-up`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -435,18 +335,49 @@ export default function Register() {
           civility,
           Tel: tel,
           Note: note || "", // Optionnel
-          handicap: Object.values(handicaps).includes(true), // True si au moins un handicap est coché
+          handicap: Object.values(handicaps).includes(true), // true si au moins un handicap est coché
         }),
       });
   
-      const data = await response.json();
-  
-      if (response.ok) {
-        Alert.alert("Succès", "Inscription réussie !");
-        router.push("/Login"); // Redirection vers la page de connexion
-      } else {
-        Alert.alert("Erreur", data.error || "Une erreur s'est produite");
+      if (!firebaseResponse.ok) {
+        const errorData = await firebaseResponse.json();
+        Alert.alert("Erreur", errorData.error || "Une erreur s'est produite lors de l'inscription Firebase.");
+        return;
       }
+  
+      const firebaseData = await firebaseResponse.json();
+      // Supposons que firebaseData contient l'uid de l'utilisateur
+      const firebaseUID = firebaseData.user?.uid || firebaseData.uid;
+  
+      // Appel pour la création de l'utilisateur dans votre base de données
+      const userResponse = await fetch(`${API_CONFIG.BASE_URL}/user`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstname: firstName,
+          lastname: lastName,
+          birthdate: formatISOBirthdate(birthdate),
+          email,
+          tel,
+          password,
+          civility,
+          note,
+          handicap: Object.values(handicaps).includes(true) ? 1 : 0,
+          googleUUID: firebaseUID, // Utilisation de googleUUID récupéré depuis Firebase
+        }),
+      });
+  
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        Alert.alert("Erreur", errorData.error || "Une erreur s'est produite lors de la création de l'utilisateur.");
+        return;
+      }
+  
+      Alert.alert("Succès", "Inscription réussie !");
+      router.replace("./Login"); // Redirection vers la page de connexion
     } catch (error) {
       console.error("Erreur lors de l'inscription :", error);
       Alert.alert("Erreur", "Une erreur est survenue. Vérifiez votre connexion.");
@@ -454,6 +385,8 @@ export default function Register() {
       setIsLoading(false);
     }
   };
+  
+  
   
 
   // Fonction pour afficher l'étape actuelle

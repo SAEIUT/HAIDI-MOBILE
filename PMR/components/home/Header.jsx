@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, Pressable} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,10 @@ import { API_CONFIG } from '../../constants/API_CONFIG';
 import SearchBar from './SearchBar';
 import Photo from '../Photos/Photo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+// import { Pressable } from 'react-native-paper/lib/typescript/components/TouchableRipple/Pressable';
+import { Notif} from './../../app/services/PageNotifComponent'; 
+import { router } from 'expo-router';
+
 
 export default function Header() {
   const navigation = useNavigation();
@@ -24,15 +28,15 @@ export default function Header() {
     const getUserUid = async () => {
       try {
         const storedUid = await AsyncStorage.getItem('userUid');
-        console.log("UID récupéré :", storedUid);
+        // console.log("UID récupéré :", storedUid);
         if (storedUid) {
           setUserUid(storedUid);
         } else {
-          console.log("Pas d'UID, redirection vers connexion.");
+          // console.log("Pas d'UID, redirection vers connexion.");
           navigation.replace("/Login");
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'UID :", error);
+        // console.error("Erreur lors de la récupération de l'UID :", error);
       }
     };
   
@@ -47,19 +51,19 @@ export default function Header() {
     const fetchCurrentUser = async () => {
       setPending(true);
       try {
-        console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
+        // console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
         const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${userUid}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
   
         const data = await response.json();
-        console.log("Données utilisateur reçues :", data);
+        // console.log("Données utilisateur reçues :", data);
   
         if (response.ok) {
           setUser(data.user);
         } else {
-          console.log("Erreur API:", data.error);
+          // console.log("Erreur API:", data.error);
           navigation.replace("/Login");
         }
       } catch (error) {
@@ -91,7 +95,7 @@ export default function Header() {
             <View style={styles.ConText}>
               <Text style={styles.Text1}>Bienvenue,</Text>
               {user && user.firstName && (
-                <Text style={styles.Text2}> {user.firstName} 👋</Text>
+                <Text style={styles.Text2}> {user.firstName || user.firstname} 👋</Text>
               )}
             </View>
             <View style={styles.ConText2}>
@@ -102,7 +106,9 @@ export default function Header() {
           </View>
 
           <View style={styles.rightContainer}>
-            <Ionicons name="notifications-circle" size={47} color="white" style={styles.notif} />
+            <Pressable onPress={() => router.push('services/PageNotifComponent')}>
+              <Ionicons name="notifications-circle" size={47} color="white" style={styles.notif} />
+            </Pressable>
           </View>
         </View>
       </View>

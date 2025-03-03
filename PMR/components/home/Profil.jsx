@@ -21,11 +21,11 @@ export default function Profil() {
     const getUserUid = async () => {
       try {
         const storedUid = await AsyncStorage.getItem('userUid');
-        console.log("UID récupéré :", storedUid);
+        // console.log("UID récupéré :", storedUid);
         if (storedUid) {
           setUserUid(storedUid);
         } else {
-          console.log("Pas d'UID, redirection vers connexion.");
+          // console.log("Pas d'UID, redirection vers connexion.");
           navigation.replace("/Login");
         }
       } catch (error) {
@@ -43,17 +43,18 @@ export default function Profil() {
     const fetchCurrentUser = async () => {
       setPending(true);
       try {
-        console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
+        // console.log("Appel API :", `${API_CONFIG.BASE_URL}/firebase/user/${userUid}`);
         const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${userUid}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
   
         const data = await response.json();
-        console.log("Données utilisateur reçues :", data);
+        // console.log("Données utilisateur reçues :", data.user);
   
         if (response.ok) {
           setUser(data.user);
+          console.log("je fais user : ", user);
         } else {
           console.log("Erreur API:", data.error);
           navigation.replace("/Login");
@@ -71,7 +72,7 @@ export default function Profil() {
   return (
     <View style={styles.container}>
       <Text style={styles.status}>Profil</Text>
-      <Text>{user ? `Bienvenue ${user.firstName}` : "Chargement..."}</Text>
+      <Text>{user ? `Bienvenue ${user.firstName || user.firstname}` : "Chargement..."}</Text>
 
       {pending && (
         <View style={styles.pending}>
@@ -87,8 +88,8 @@ export default function Profil() {
             </View>
             <View style={styles.ConText}>
               <Text style={styles.Text1}>Bienvenue,</Text>
-              {user && user.firstName && (
-                <Text style={styles.Text2}> {user.firstName} 👋</Text>
+              {user && user.firstName  && (
+                <Text style={styles.Text2}> {user.firstName || user.firstname} 👋</Text>
               )}
             </View>
             <View style={styles.OnGoing}>

@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PhotoContext } from '../Photos/PhotoContext2';
 import EditProfile from './EditProfile';
 import { API_CONFIG } from '../../constants/API_CONFIG';
+import Profil from '../home/Profil';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState(null);
@@ -17,62 +14,106 @@ const ProfileScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
   const router = useRouter();
-  const auth = getAuth();
   const [id, setId] = useState(null);
   const { photo, setPhoto } = React.useContext(PhotoContext);
+  const [userID, setUserID] = useState(null); // État pour stocker l'UID
 
-  // Récupérer le profil de l'utilisateur en utilisant BASE_URL
-  const fetchUserProfile = async () => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) {
-        Alert.alert('Erreur', 'Utilisateur non authentifié.');
-        return;
-      }
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/user/byGoogleID/${userId}`);
-      if (response.ok) {
+  // Récupérer l'UID et charger le profil utilisateur
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const storedUid = await AsyncStorage.getItem('userUid');
+        if (!storedUid) {
+          Alert.alert('Erreur', 'Utilisateur non authentifié.');
+          router.replace('/Login');
+          return;
+        }
+
+        // Stocker l'UID dans l'état
+        setUserID(storedUid);
+
+        // Charger le profil utilisateur
+        const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${storedUid}`);
+        const response2 = await fetch(`${API_CONFIG.BASE_URL}/user/byGoogleID/${storedUid}`);
+
+
+        if (!response.ok) {
+          Alert.alert('Erreur', 'Impossible de récupérer les données utilisateur.');
+          return;
+        }
+
         const responseData = await response.json();
-        setId(responseData.id);
+        const responseData2 = await response2.json();
+
+        console.log("Modification MongoDB :", responseData2);
+        console.log("Modification Firebase :", responseData);
+        setId(responseData2.id);
+
+        // console.log("id qu'on veut " , id);
         setProfile({
-          firstName: responseData.firstname,
-          lastName: responseData.lastname,
-          email: responseData.email,
-          tel: responseData.tel,
+          firstName: responseData.user.firstName || responseData.user.firstname ,
+          lastName: responseData.user.lastName || responseData.user.lastname,
+          email: responseData.user.Email || responseData.user.email,
+          tel: responseData.user.Tel,
         });
+
+        
+        console.log("mes jeux des données : " , responseData);
+        console.log("Prénom :", responseData.user.firstname);
+
         setEditedProfile({
-          firstName: responseData.firstname,
-          lastName: responseData.lastname,
-          email: responseData.email,
-          tel: responseData.tel,
+          firstName: responseData.user.firstName || responseData.user.firstname ,
+          lastName: responseData.user.lastName || responseData.user.lastname,
+          email: responseData.user.Email || responseData.user.email,
+          tel: responseData.user.Tel,
           password: '',
         });
-      } else {
-        Alert.alert('Erreur', 'Données utilisateur non disponibles.');
+      } catch (error) {
+        Alert.alert('Erreur', 'Une erreur est survenue lors du chargement du profil.');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      Alert.alert('Erreur', 'Impossible de récupérer les données utilisateur.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
+    fetchUserProfile();
+  }, []);
+
+  // console.log("le profil de l'utilisateur : ", profile);
+  console.log("le editprofil de l'utilisateur : ", editedProfile);
+
+  // Mettre à jour le profil utilisateur
   const handleSaveProfile = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/user/${id}`, {
+      // Mise à jour du profil dans la base MongoDB
+      const response = await fetch(`${API_CONFIG.BASE_URL}/user/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editedProfile),
+      });
+  
+      // Mise à jour du profil dans Firebase
+      const response2 = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/${userID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editedProfile),
       });
-
-      if (!response.ok) throw new Error('Erreur lors de la mise à jour.');
+  
+      // Vérification que les deux mises à jour se sont bien déroulées
+      if (!response.ok || !response2.ok) {
+        throw new Error('Erreur lors de la mise à jour.');
+      }
+  
       Alert.alert('Succès', 'Profil mis à jour.');
       setProfile(editedProfile);
       setIsEditing(false);
     } catch (error) {
+      console.error('Erreur lors de la mise à jour du profil :', error);
       Alert.alert('Erreur', 'Impossible de mettre à jour le profil.');
     }
   };
+  
 
+  // Supprimer le compte utilisateur
   const handleDeleteProfile = async () => {
     Alert.alert(
       'Confirmation',
@@ -84,30 +125,22 @@ const ProfileScreen = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const userId = auth.currentUser?.uid;
-              const response = await fetch(`${API_CONFIG.BASE_URL}/api/user/byGoogleID/${userId}`);
-              if (!response.ok) throw new Error('Erreur lors de la suppression des données utilisateur.');
-              
-              const responseData = await response.json();
-              const deleteResponse = await fetch(`${API_CONFIG.BASE_URL}/api/user/delete/${responseData.id}`, {
+              if (!userID) {
+                Alert.alert('Erreur', 'Utilisateur non authentifié.');
+                return;
+              }
+
+              const response = await fetch(`${API_CONFIG.BASE_URL}/api/user/delete/${id}`, {
                 method: 'DELETE',
               });
 
-              if (!deleteResponse.ok) throw new Error('Erreur lors de la suppression dans la base de données.');
+              if (!response.ok) throw new Error('Erreur lors de la suppression du compte.');
 
-              await auth.currentUser?.delete();
               Alert.alert('Compte supprimé', 'Votre compte a été supprimé avec succès.');
-              router.replace('/');
+              await AsyncStorage.removeItem('userUid');
+              router.replace('/Login');
             } catch (error) {
-              console.error('Erreur lors de la suppression du profil :', error.message);
-              if (error.code === 'auth/requires-recent-login') {
-                Alert.alert(
-                  'Reconnexion requise',
-                  'Vous devez vous reconnecter récemment pour supprimer votre compte. Veuillez vous déconnecter et vous reconnecter.',
-                );
-              } else {
-                Alert.alert('Erreur', 'Impossible de supprimer le profil.');
-              }
+              Alert.alert('Erreur', 'Impossible de supprimer le profil.');
             }
           },
         },
@@ -115,6 +148,7 @@ const ProfileScreen = () => {
     );
   };
 
+  // Se déconnecter
   const handleSignOut = async () => {
     Alert.alert(
       'Confirmation',
@@ -126,7 +160,7 @@ const ProfileScreen = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await signOut(auth);
+              await AsyncStorage.removeItem('userUid');
               router.replace('/');
             } catch (error) {
               Alert.alert('Erreur', 'Impossible de se déconnecter.');
@@ -136,6 +170,7 @@ const ProfileScreen = () => {
       ],
     );
   };
+
 
   const handlePhotoPress = async () => {
     Alert.alert(
@@ -164,14 +199,8 @@ const ProfileScreen = () => {
   };
 
   const pickImage = async (source) => {
-    // Demander les permissions en fonction de la source (caméra ou galerie)
-    let permissionResult;
-    if (source === 'camera') {
-      permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    } else {
-      permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    }
-    if (permissionResult.status !== 'granted') {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
       alert("Désolé, nous avons besoin de la permission d'accéder à la galerie ou à l'appareil photo pour continuer.");
       return;
     }
@@ -206,7 +235,7 @@ const ProfileScreen = () => {
         });
 
         setPhoto({ uri: filePath });
-        await AsyncStorage.setItem(`profilePhoto_${auth.currentUser?.uid}`, filePath);
+        await AsyncStorage.setItem(`profilePhoto_${userID}`, filePath);
         await MediaLibrary.createAssetAsync(filePath);
       } catch (error) {
         console.error("Erreur lors de la sauvegarde de l'image :", error);
@@ -216,7 +245,7 @@ const ProfileScreen = () => {
 
   const deletePhoto = async () => {
     try {
-      await AsyncStorage.removeItem(`profilePhoto_${auth.currentUser?.uid}`);
+      await AsyncStorage.removeItem(`profilePhoto_${userID} `);
       setPhoto(require("./../../assets/Profile/profil.jpeg"));
     } catch (error) {
       console.error("Erreur lors de la suppression de la photo :", error);
@@ -224,13 +253,9 @@ const ProfileScreen = () => {
   };
 
   useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  useEffect(() => {
     const loadSavedPhoto = async () => {
       try {
-        const savedPhoto = await AsyncStorage.getItem(`profilePhoto_${auth.currentUser?.uid}`);
+        const savedPhoto = await AsyncStorage.getItem(`profilePhoto_${userID}`);
         if (savedPhoto) {
           setPhoto({ uri: savedPhoto });
         }
@@ -326,6 +351,8 @@ const ProfileScreen = () => {
           />
         ) : (
           renderUserInfo()
+          
+
         )}
         <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleSignOut}>
           <Text style={[styles.buttonText, { color: '#FF5252', textDecorationLine: 'underline' }]}>
@@ -342,14 +369,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#42547e',
+    backgroundColor: '#42547e',  // couleur du fonnd 
     padding: 20,
     paddingTop: 50,
   },
   avatarContainer: {
     position: 'relative',
     width: 70,
-    height: 70,
+    height:70,
     marginBottom: 20,
   },
   avatar: {
@@ -368,7 +395,10 @@ const styles = StyleSheet.create({
     padding: 6,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     zIndex: 1,

@@ -19,7 +19,7 @@ export default function Tickets() {
         const getUserUid = async () => {
             try {
                 const storedUid = await AsyncStorage.getItem('userUid');
-                console.log("UID récupéré :", storedUid);
+                console.log("UID récupéré  dans ticket:", storedUid);
                 if (storedUid) {
                     setUserUid(storedUid);
                 } else {
@@ -41,9 +41,10 @@ export default function Tickets() {
 
     const retrieveTrajet = async () => {
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/reservation/byuid/${userUid}`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/reservation/bygoogleid/${userUid}`);
+            console.log("reponse de l'api ticket :" ,response)
             const data = await response.json();
-            console.log("Données récupérées :", data);
+            console.log("Données récupérées de la resvation :", data);
             setData(data);
         } catch (error) {
             console.log("Erreur :", error);
