@@ -17,7 +17,7 @@ export default function Header() {
         const getUserUid = async () => {
         try {
             const storedUid = await AsyncStorage.getItem('userUid');
-            console.log("UID récupéré pour le header :", storedUid);
+            console.log("UID récupéré pour le hbeader :", storedUid);
             if (storedUid) {
             setUserUid(storedUid);
             } else {

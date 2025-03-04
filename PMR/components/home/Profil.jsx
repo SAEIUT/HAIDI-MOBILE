@@ -25,8 +25,8 @@ export default function Profil() {
         if (storedUid) {
           setUserUid(storedUid);
         } else {
-          // console.log("Pas d'UID, redirection vers connexion.");
-          navigation.replace("/Login");
+          console.log("Pas d'UID, redirection vers connexion.");
+          // navigation.replace("/Login");
         }
       } catch (error) {
         console.error("Erreur lors de la récupération de l'UID :", error);
@@ -50,7 +50,7 @@ export default function Profil() {
         });
   
         const data = await response.json();
-        // console.log("Données utilisateur reçues :", data.user);
+        console.log("Données utilisateur reçues :", data.user);
   
         if (response.ok) {
           setUser(data.user);
@@ -125,11 +125,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#192031",
     zIndex: 20,
   },
-  box2: {
-    width: "100%",
-    height: 350,
+
+  box2:{
+    width:"100%",
+    height: 350, 
     top: 690
   },
+
   pending: {
     flex: 1,
     width: "100%",
@@ -138,13 +140,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  header: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "red",
+    marginTop: 40,
+    left: 25,
+  },
   container2: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 8,
     height: 66,
-    top: 5,
+    top: 5, 
   },
   leftContainer: {
     width: "50%",
@@ -156,6 +166,7 @@ const styles = StyleSheet.create({
     marginTop: 52,
     left: 10,
   },
+
   ConText: {
     marginTop: 42,
     left: 10,
@@ -170,19 +181,27 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontWeight: "bold",
   },
+  ConText2: {
+    width: 300,
+    marginTop:240,
+    marginLeft: 1,
+    height: 80,
+    right:120
+  },
+
   rightContainer: {
     width: "37%",
     height: 45,
     marginTop: 60,
     borderRadius: 25,
-    top: 10,
+    top: 10, 
   },
   Text3: {
     color: "white",
     marginTop: 3,
     fontWeight: "bold",
     fontStyle: "italic",
-    fontSize: 20
+    fontSize:20
   },
   OnGoing: {
     top: 150,
@@ -190,9 +209,10 @@ const styles = StyleSheet.create({
     height: 130,
     left: -95,
     borderRadius: 7,
-    display: "flex",
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
+    display: "flex", 
+    textAlign: "center", 
+    justifyContent: "center", // Centre verticalement les enfants
+    alignItems: "center", // Centre horizontalement les enfants
   }
+
 });
