@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -11,7 +11,8 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getAuth } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_CONFIG } from '../../constants/API_CONFIG';
 
 // Fonction utilitaire pour générer une heure aléatoire
 const generateRandomTime = () => {
@@ -45,7 +46,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         leftUnattended: false,
         acceptedItems: false,
         receivedItems: false,
-        dangerousGoods: false
+        dangerousGoods: false,
       },
       declarations: {
         weaponsFirearms: false,
@@ -54,8 +55,8 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         radioactiveMaterials: false,
         toxicSubstances: false,
         compressedGases: false,
-        illegalDrugs: false
-      }
+        illegalDrugs: false,
+      },
     },
     additionalInfo: {
       emergencyContact: '',
@@ -64,8 +65,31 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
     },
   });
 
+  const [userUid, setUserUid] = useState(null);
+
+  // Récupérer l'UID de l'utilisateur
+  useEffect(() => {
+    const getUserUid = async () => {
+      try {
+        const storedUid = await AsyncStorage.getItem('userUid');
+        if (storedUid) {
+          setUserUid(storedUid);
+        } else {
+          console.log("Pas d'UID trouvé.");
+          // navigation.replace("/Login");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'UID :", error);
+      }
+    };
+
+    getUserUid();
+  }, []);
+
+  console.log("id : ", userUid);
+
   const updateFormData = (section, field, value) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       if (typeof value === 'object') {
         // Pour les mises à jour d'objets imbriqués (comme les declarations)
         return {
@@ -74,9 +98,9 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
             ...prev[section],
             [field]: {
               ...prev[section][field],
-              ...value
-            }
-          }
+              ...value,
+            },
+          },
         };
       } else {
         // Pour les mises à jour simples
@@ -84,36 +108,20 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           ...prev,
           [section]: {
             ...prev[section],
-            [field]: value
-          }
+            [field]: value,
+          },
         };
       }
     });
   };
 
-  // Fonction pour formater les données selon le schéma MongoDB
-  
-  const generateReservationJson = () => {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
-    const idDossier = Math.floor(Math.random() * 1000000);
-  
-    // Création de l'objet de données formaté
-  
-    console.log('Données formatées:', formattedData);
-    return formattedData;
-  };
-  
   const handleSubmitReservation = async () => {
     try {
       console.log('Préparation des données de réservation...');
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
   
       // Récupérer l'ID du PMR depuis l'API
-      const userResponse = await fetch('http://172.20.10.7:80/api/user/all');
-      const users = await userResponse.json();
-      const userFound = users.find(user => user.googleUUID === currentUser?.uid);
+      const userResponse = await fetch(`${API_CONFIG.BASE_URL}/user/byGoogleID/${userUid}`);
+      const userFound = await userResponse.json();
   
       if (!userFound) {
         throw new Error('Utilisateur non trouvé');
@@ -124,7 +132,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
       const reservationData = {
         idDossier,
         idPMR: userFound.id,
-        googleId: currentUser?.uid || '',
+        googleId: userUid,
         enregistre: true,
         sousTrajets: route.segments.map((segment, index) => ({
           BD: segment.mode.toUpperCase(),
@@ -159,7 +167,8 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   
       console.log('Envoi des données:', reservationData);
   
-      const response = await fetch('http://172.20.10.7:80/api/reservation', {
+      // Correction de l'URL
+      const response = await fetch(`${API_CONFIG.BASE_URL}/reservation`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -180,12 +189,9 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
     }
   };
 
-  
-
   const BaggageStep = () => (
     <ScrollView style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Bagages</Text>
-
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Avez-vous des bagages ?</Text>
         <Switch
@@ -194,7 +200,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           ios_backgroundColor="#3e3e3e"
         />
       </View>
-
       {formData.baggage.hasBaggage && (
         <>
           <Text style={styles.label}>Nombre de bagages</Text>
@@ -206,7 +211,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
             placeholder="Nombre de bagages"
             placeholderTextColor="#888"
           />
-
           <Text style={styles.label}>Bagages spéciaux</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
@@ -224,7 +228,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   const AssistanceStep = () => (
     <ScrollView style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Assistance Spéciale</Text>
-
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Fauteuil roulant</Text>
         <Switch
@@ -233,7 +236,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           ios_backgroundColor="#3e3e3e"
         />
       </View>
-
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Assistance visuelle</Text>
         <Switch
@@ -242,7 +244,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           ios_backgroundColor="#3e3e3e"
         />
       </View>
-
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Assistance auditive</Text>
         <Switch
@@ -251,7 +252,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           ios_backgroundColor="#3e3e3e"
         />
       </View>
-
       <Text style={styles.label}>Autre assistance requise</Text>
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -267,7 +267,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   const SecurityStep = () => (
     <ScrollView style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Vérification de Sécurité</Text>
-
       <View style={styles.securitySection}>
         <View style={styles.iconHeader}>
           <Ionicons name="document-text" size={24} color="#12B3A8" />
@@ -282,7 +281,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           />
         </View>
       </View>
-
       <View style={styles.securitySection}>
         <View style={styles.iconHeader}>
           <Ionicons name="warning" size={24} color="#12B3A8" />
@@ -295,7 +293,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           radioactiveMaterials: { icon: 'radio', label: 'Je déclare ne pas transporter de matières radioactives' },
           toxicSubstances: { icon: 'skull', label: 'Je déclare ne pas transporter de substances toxiques' },
           compressedGases: { icon: 'cube', label: 'Je déclare ne pas transporter de gaz comprimés' },
-          illegalDrugs: { icon: 'medkit', label: 'Je déclare ne pas transporter de substances illicites' }
+          illegalDrugs: { icon: 'medkit', label: 'Je déclare ne pas transporter de substances illicites' },
         }).map(([key, { icon, label }]) => (
           <View key={key} style={styles.checkItem}>
             <Ionicons name={icon} size={20} color="white" />
@@ -305,7 +303,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
               onValueChange={(value) => {
                 const updatedDeclarations = {
                   ...formData.security.declarations,
-                  [key]: value
+                  [key]: value,
                 };
                 updateFormData('security', 'declarations', updatedDeclarations);
               }}
@@ -314,7 +312,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           </View>
         ))}
       </View>
-
       <View style={styles.securitySection}>
         <View style={styles.iconHeader}>
           <Ionicons name="help-circle" size={24} color="#12B3A8" />
@@ -324,7 +321,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           { key: 'packedOwn', label: 'Avez-vous fait vos bagages vous-même ?' },
           { key: 'leftUnattended', label: 'Vos bagages sont-ils restés sous votre surveillance ?' },
           { key: 'acceptedItems', label: 'Avez-vous accepté des objets d\'autres personnes ?' },
-          { key: 'receivedItems', label: 'Transportez-vous des objets pour d\'autres personnes ?' }
+          { key: 'receivedItems', label: 'Transportez-vous des objets pour d\'autres personnes ?' },
         ].map(({ key, label }) => (
           <View key={key} style={styles.questionItem}>
             <Text style={styles.questionText}>{label}</Text>
@@ -333,7 +330,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
               onValueChange={(value) => {
                 const updatedQuestions = {
                   ...formData.security.securityQuestions,
-                  [key]: value
+                  [key]: value,
                 };
                 updateFormData('security', 'securityQuestions', updatedQuestions);
               }}
@@ -342,7 +339,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           </View>
         ))}
       </View>
-
       <View style={styles.securitySection}>
         <View style={styles.iconHeader}>
           <Ionicons name="medical" size={24} color="#12B3A8" />
@@ -363,7 +359,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   const AdditionalInfoStep = () => (
     <ScrollView style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Informations Complémentaires</Text>
-
       <Text style={styles.label}>Contact d'urgence</Text>
       <TextInput
         style={styles.input}
@@ -372,7 +367,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         placeholder="Nom et numéro de téléphone"
         placeholderTextColor="#888"
       />
-
       <Text style={styles.label}>Informations médicales importantes</Text>
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -382,7 +376,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         placeholder="Allergies, médicaments, etc."
         placeholderTextColor="#888"
       />
-
       <Text style={styles.label}>Restrictions alimentaires</Text>
       <TextInput
         style={styles.input}
@@ -397,7 +390,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   const ConfirmationStep = () => (
     <ScrollView style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Confirmation de Réservation</Text>
-
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Itinéraire</Text>
         {route.segments.map((segment, index) => (
@@ -413,7 +405,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           </View>
         ))}
       </View>
-
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Bagages</Text>
         <Text style={styles.summaryText}>
@@ -424,7 +415,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
             : 'Aucun bagage'}
         </Text>
       </View>
-
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Assistance</Text>
         <Text style={styles.summaryText}>
@@ -438,7 +428,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
             .join('\n') || 'Aucune assistance requise'}
         </Text>
       </View>
-
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Informations Médicales</Text>
         <Text style={styles.summaryText}>
@@ -455,12 +444,12 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
     }
 
     const declarations = formData.security.declarations;
-    const allDeclared = Object.values(declarations).every(value => value === true);
+    const allDeclared = Object.values(declarations).every((value) => value === true);
 
     if (!allDeclared) {
       Alert.alert(
         'Déclarations Requises',
-        'Vous devez confirmer toutes les déclarations de non-transport d\'objets interdits.'
+        'Vous devez confirmer toutes les déclarations de non-transport d\'objets interdits.',
       );
       return false;
     }
@@ -470,10 +459,15 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
       return false;
     }
 
-    if (formData.security.securityQuestions.leftUnattended ||
-        formData.security.securityQuestions.acceptedItems ||
-        formData.security.securityQuestions.receivedItems) {
-      Alert.alert('Alerte de Sécurité', 'Vos réponses aux questions de sécurité ne permettent pas de poursuivre la réservation.');
+    if (
+      formData.security.securityQuestions.leftUnattended ||
+      formData.security.securityQuestions.acceptedItems ||
+      formData.security.securityQuestions.receivedItems
+    ) {
+      Alert.alert(
+        'Alerte de Sécurité',
+        'Vos réponses aux questions de sécurité ne permettent pas de poursuivre la réservation.',
+      );
       return false;
     }
 
@@ -481,9 +475,14 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
   };
 
   const handleConfirmation = async () => {
+    if (!userUid) {
+      Alert.alert('Erreur', 'UID utilisateur non trouvé.');
+      return;
+    }
+
     try {
       const result = await handleSubmitReservation();
-      
+
       if (result.success) {
         Alert.alert(
           'Succès',
@@ -494,9 +493,9 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
               onPress: () => {
                 onClose(); // Ferme d'abord le modal
                 onConfirm(); // Puis redirige vers la page Trajets
-              }
-            }
-          ]
+              },
+            },
+          ],
         );
       } else {
         Alert.alert(
@@ -505,9 +504,9 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
           [
             {
               text: 'OK',
-              style: 'cancel'
-            }
-          ]
+              style: 'cancel',
+            },
+          ],
         );
       }
     } catch (error) {
@@ -518,9 +517,9 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         [
           {
             text: 'OK',
-            style: 'cancel'
-          }
-        ]
+            style: 'cancel',
+          },
+        ],
       );
     }
   };

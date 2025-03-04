@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import CurrentTrajet from '../../components/trajet/TrajetEnCours';
 import { useRoute } from '@react-navigation/native';
@@ -18,6 +18,8 @@ export default function Trajet() {
                 setParam([route.params["idDossier"], route.params["numDossier"]]);
                 console.log("Paramètres reçus :", param);
                 setLoading(false);
+            }  else {
+                Alert("QR code invalide");
             }
         } catch (error) {
             console.error(error);
