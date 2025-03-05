@@ -30,7 +30,6 @@ export default function Header() {
         // console.log("UID récupéré :", storedUid);
         if (storedUid) {
           setUserUid(storedUid);
-          console.log('passe');
         } else {
           // console.log("Pas d'UID, redirection vers connexion.");
           navigation.replace("/Login");
@@ -58,11 +57,10 @@ export default function Header() {
         });
   
         const data = await response.json();
-        console.log("Données utilisateur reçues :", data);
+        // console.log("Données utilisateur reçues :", data);
   
         if (response.ok) {
           setUser(data.user);
-          console.log("passe 2 :");
         } else {
           // console.log("Erreur API:", data.error);
           navigation.replace("/Login");
@@ -77,7 +75,6 @@ export default function Header() {
     fetchCurrentUser();
   }, [userUid]);
   
-console.log(user)
   return (
     <View style={styles.container}>
       <StatusBar style="light" />

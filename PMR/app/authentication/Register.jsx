@@ -17,9 +17,6 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { Checkbox } from 'react-native-paper';
 import { router, useNavigation } from 'expo-router';
-// import { createUserWithEmailAndPassword } from 'firebase/auth';
-// import { auth, db } from './firebaseConfig';
-// import { doc, setDoc } from 'firebase/firestore';
 import { CameraView as ExpoCamera, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { API_CONFIG } from '../../constants/API_CONFIG';

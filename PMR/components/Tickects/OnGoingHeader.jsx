@@ -24,7 +24,8 @@ export default function OnGoingHeader() {
 
     const retrieveTrajet = async () => {
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/reservation/byuid/${userUid}`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/reservation/bygoogleid/${userUid}`);
+            console.log(response.url)
             const data = await response.json();
             console.log("Données récupérées :", data);
             setData(data);
