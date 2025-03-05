@@ -86,7 +86,6 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
     getUserUid();
   }, []);
 
-  console.log("id : ", userUid);
 
   const updateFormData = (section, field, value) => {
     setFormData((prev) => {
@@ -137,6 +136,7 @@ const ReservationModal = ({ visible, onClose, onConfirm, route }) => {
         sousTrajets: route.segments.map((segment, index) => ({
           BD: segment.mode.toUpperCase(),
           numDossier: idDossier + index,
+          idTrajet: Math.random() * 1000 * 10000 - 1000,
           statusValue: 0,
           departureTime: "2024-12-24T04:25:44",
           arrivalTime: "2024-12-24T01:25:44",

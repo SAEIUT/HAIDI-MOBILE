@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-
+import { API_CONFIG } from '../../constants/API_CONFIG';
 // Component for individual notification
 const NotificationItem = ({ notification, onViewDetails }) => {
   // Get time since notification (e.g., "8 min", "2 h")
@@ -44,6 +45,17 @@ export default function PageNotif() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+
+
+
+  const navigation = useNavigation(); 
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
   
   // The userId should come from your authentication system
   const userId = 321; // Example user ID - replace with actual user ID from your auth system
@@ -56,7 +68,7 @@ export default function PageNotif() {
       try {
         if (!isMounted) return;
         
-        const response = await fetch('http://172.20.10.7/api/notification/notifications', {
+        const response = await fetch(`${API_CONFIG.BASE_URL}notification/consume`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -137,7 +149,7 @@ export default function PageNotif() {
   // Function to send a test notification (for testing purposes)
   const sendTestNotification = async () => {
     try {
-      const response = await fetch('http://172.20.10.7/api/notification/produce', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}notification/produce`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,8 +174,8 @@ export default function PageNotif() {
   // Function to manually refresh notifications
   const fetchLatestNotifications = async () => {
     try {
-      const response = await fetch('http://172.20.10.7/api/notification/notifications', {
-        method: 'POST',
+        const response = await fetch(`${API_CONFIG.BASE_URL}notification/consume`, {
+            method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -238,7 +250,7 @@ export default function PageNotif() {
         <View style={styles.headerContent}>
           <TouchableOpacity 
             style={styles.backButton} 
-            onPress={() => router.push("../(TabBar)/Home")}
+            onPress={() => router.push("./PageNotifComponent")}
           >
             <AntDesign name="left" size={24} color="white" />
           </TouchableOpacity>
