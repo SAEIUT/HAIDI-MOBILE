@@ -60,39 +60,31 @@ export default function Login() {
       return;
     }
     try {
-      // console.log("Tentative de connexion avec :", email, password);
-      try {
-        const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/sign-in`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-      
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
-        }
-      
-        const data = await response.json();
-        console.log("Réponse API:", data);
-      } catch (error) {
-        console.error("Erreur lors du fetch:", error);
+      const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/sign-in`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
       }
-      // console.log("Données reçues :", data);
-      if (response.ok && data.user && data.user.uid) {
-        // console.log("UID récupéré :", data.user.uid);
+  
+      const data = await response.json();
+      console.log("Réponse API:", data);
+  
+      if (data.user && data.user.uid) {
         await AsyncStorage.setItem('userUid', data.user.uid);
-        // console.log("UID stocké dans AsyncStorage");
         router.replace("../(TabBar)/Home");
       } else {
-        // console.error("Aucun UID reçu ou erreur API.");
         alert("Erreur lors de la connexion.");
       }
     } catch (error) {
-      // console.error('Erreur de connexion :', error);
+      console.error('Erreur de connexion :', error);
       alert("Impossible de se connecter");
     }
   };
-
+  
   return (
     <SafeAreaView style={styles.safe}>
       <AnimatedBackground />
