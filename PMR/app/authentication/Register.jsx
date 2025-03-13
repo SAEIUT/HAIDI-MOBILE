@@ -247,14 +247,46 @@ export default function Register() {
       }
     }
   };
-
   // Fonction pour valider l'étape actuelle
-  const validateStep = (step) => {
+  const validateStep = async (step) => {
     switch (step) {
       case 1:
+        if (!firstName || !lastName || !birthdate || !civility || civility === "") {
+          Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires.");
+          return false;
+        }
         return firstName && lastName && birthdate && civility && civility !== "";
-      case 2:
-        return age && tel && email;
+        case 2:
+          if (!age || !tel || !email) {
+            Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires.");
+            return false;
+          }
+        
+          try {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/user/check-email`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+              Alert.alert("Erreur", "Problème de connexion au serveur.");
+              return false;
+            }
+
+            const data = await response.json();
+
+            if (data.exists) {
+              Alert.alert("Erreur", "Un compte avec cet email existe déjà.");
+              return false;
+            }
+
+          } catch (error) {
+            console.error("Erreur lors de la vérification de l'email :", error);  
+            Alert.alert("Erreur", "Impossible de vérifier l'email. Veuillez réessayer.");
+            return false;
+          }
+        return true;
       case 3:
         return true; // Les handicaps sont optionnels
       case 4:
@@ -285,13 +317,15 @@ export default function Register() {
   };
 
   // Fonction pour passer à l'étape suivante
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires.');
+  const nextStep = async () => {
+    const isValid = await validateStep(currentStep); // Attendre la validation
+  
+    if (isValid) {
+      setCurrentStep((prevStep) => prevStep + 1); // Passe à l'étape suivante seulement si validé
     }
   };
+  
+  
 
   // Fonction pour revenir à l'étape précédente
   const prevStep = () => {
