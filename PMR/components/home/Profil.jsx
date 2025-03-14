@@ -126,10 +126,12 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
 
+  // Augmentation de la hauteur pour s'étendre vers le bas
   box2:{
     width:"100%",
-    height: 350, 
-    top: 690
+    height: 1000, // Hauteur très grande pour s'assurer qu'elle s'étend vers le bas
+    top: 290, // Juste sous le header
+    position: "absolute",
   },
 
   pending: {
@@ -211,8 +213,11 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     display: "flex", 
     textAlign: "center", 
-    justifyContent: "center", // Centre verticalement les enfants
-    alignItems: "center", // Centre horizontalement les enfants
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  status: {
+    position: "absolute",
+    top: -1000, // Cache ce texte hors de l'écran
   }
-
 });

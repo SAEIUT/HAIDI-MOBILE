@@ -165,7 +165,7 @@ const Home = () => {
                                                 name={item.type === 'place' ? 'location-outline' : 
                                                       item.type === 'address' ? 'home-outline' : 'business-outline'} 
                                                 size={16} 
-                                                color="#8E8E93" 
+                                                color="#D3D3DEFF" 
                                                 style={styles.suggestionIcon}
                                             />
                                             <View>
@@ -268,7 +268,7 @@ const Home = () => {
                 </View>
             </View>
 
-            {/* Date Picker Modal */}
+            {/* Date Picker Modal modifié */}
             {(showDeparturePicker || showReturnPicker) && (
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
@@ -288,6 +288,8 @@ const Home = () => {
                             locale="fr-FR"
                             minimumDate={new Date()}
                             style={styles.datePicker}
+                            textColor="#000000" // Ajout de la couleur noire pour le texte
+                            themeVariant="light" // Force le thème clair
                         />
                         <TouchableOpacity 
                             style={styles.modalButton}
@@ -305,12 +307,16 @@ const Home = () => {
     );
 };
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#E2E1E1FF',
         // backgroundColor: 'gray',
-        borderRadius: 15, 
+        borderRadius: 15,
+        borderWidth: 0.2,
+        borderColor: '#3C3C3E41',
+        boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.1)',
     },
     innerContainer: {
         flex: 1,
@@ -322,7 +328,7 @@ const styles = StyleSheet.create({
     },
     tripTypeContainer: {
         flexDirection: 'row',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#E2E1E1FF',
         borderRadius: 12,
         padding: 4,
         marginBottom: 12,
@@ -347,10 +353,12 @@ const styles = StyleSheet.create({
     },
     inputGroup: {
         flexDirection: 'row',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#E2E1E1FF',
         borderRadius: 12,
         padding: 12,
         marginBottom: 12,
+        borderWidth: 0.9,
+        borderColor: '#3C3C3E41',
     },
     suggestionsContainer: {
         marginTop: -8,
@@ -359,18 +367,18 @@ const styles = StyleSheet.create({
     },
     suggestionsList: {
         maxHeight: 150,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#E2E1E1FF',
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#3C3C3E',
+        borderColor: '#7E7E82FF',
     },
     suggestionItem: {
         padding: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#3C3C3E',
+        borderBottomColor: '#CED0D7FF',
     },
     suggestionText: {
-        color: 'white',
+        color: '#192031',
         fontSize: 14,
     },
     inputIcon: {
@@ -381,12 +389,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     inputLabel: {
-        color: '#8E8E93',
+        color: '#192031',
         fontSize: 12,
         marginBottom: 4,
     },
     input: {
-        color: 'white',
+        color: '#192031',
         fontSize: 16,
         padding: 0,
     },
@@ -394,10 +402,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 12,
+        borderWidth: 0.9,
+        borderColor: '#00006841',
+        borderRadius: 12,
     },
     dateInput: {
         flex: 1,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#E2E1E1FF',
         borderRadius: 12,
         padding: 12,
         marginRight: 8,
@@ -406,22 +417,22 @@ const styles = StyleSheet.create({
         marginRight: 0,
     },
     dateLabel: {
-        color: '#8E8E93',
+        color: '#192031',
         fontSize: 12,
         marginBottom: 4,
     },
     dateValue: {
-        color: 'white',
+        color: '#192031',
         fontSize: 16,
     },
     travelersContainer: {
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#192031',
         borderRadius: 12,
         padding: 12,
         marginBottom: 20,
     },
     travelersLabel: {
-        color: '#8E8E93',
+        color: '#192031',
         fontSize: 12,
         marginBottom: 8,
     },
@@ -432,7 +443,7 @@ const styles = StyleSheet.create({
     travelerButton: {
         width: 32,
         height: 32,
-        backgroundColor: '#3A3A3C',
+        backgroundColor: '#192031',
         borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
@@ -454,7 +465,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     searchButtonText: {
-        color: 'white',
+        color: '#FFFFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
@@ -464,14 +475,15 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
+        borderRadius: 15,
     },
     modalContent: {
         width: '90%',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#E2E1E1FF',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -496,7 +508,7 @@ const styles = StyleSheet.create({
     },
     bottomNav: {
         flexDirection: 'row',
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#494980FF',
         paddingVertical: 12,
         paddingHorizontal: 20,
         justifyContent: 'space-between',
@@ -507,7 +519,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     navText: {
-        color: '#8E8E93',
+        color: '#192031',
         fontSize: 12,
         marginTop: 4,
     },
