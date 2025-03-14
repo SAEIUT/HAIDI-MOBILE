@@ -901,7 +901,7 @@ export default function Register() {
             
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../assets/images/CMF_1.webp')}
+                source={require('../../assets/images/CMF_1.png')}
                 style={styles.logo}
               />
             </View>

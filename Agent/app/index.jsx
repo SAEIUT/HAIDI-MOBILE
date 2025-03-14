@@ -89,7 +89,7 @@ const Particle = ({ delay }) => {
 
 // Composant principal
 export default function Index() {
-  const CMF = require('../assets/images/CMF_1.webp');
+  const CMF = require('../assets/images/CMF_1.png');
 
   return (
     <SafeAreaView style={styles.safe}>

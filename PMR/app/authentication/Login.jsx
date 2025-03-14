@@ -251,7 +251,7 @@ export default function Login() {
               style={styles.logoContainer}
             >
               <Image
-                source={require('../../assets/images/CMF_1.webp')}
+                source={require('../../assets/images/CMF_1.png')}
                 style={styles.logo}
               />
             </Reanimated.View>

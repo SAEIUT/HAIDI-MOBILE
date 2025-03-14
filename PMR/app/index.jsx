@@ -6,6 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Reanimated from 'react-native-reanimated';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 
+import { enableScreens } from 'react-native-screens';
+enableScreens();
+
 const { width, height } = Dimensions.get('window');
 
 // Composant pour l'arrière-plan animé (dégradé)
@@ -156,7 +159,7 @@ const FeatureIcon = ({ name }) => {
 
 // Composant principal
 export default function Index() {
-  const CMF = require('../assets/images/CMF_1.webp');
+  const CMF = require('../assets/images/CMF_1.png');
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

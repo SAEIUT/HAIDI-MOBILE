@@ -155,7 +155,7 @@ export default function Login() {
           {/* Logo */}
           <AnimatedComponent.View entering={FadeInDown.duration(200).springify()} style={styles.logoContainer}>
             <Image
-              source={require('../../assets/images/CMF_1.webp')}
+              source={require('../../assets/images/CMF_1.png')}
               style={styles.logo}
             />
           </AnimatedComponent.View>
