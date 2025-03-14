@@ -3,47 +3,41 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, Activ
 import { useRouter } from 'expo-router';
 import { API_CONFIG } from '../../constants/API_CONFIG';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function Header() {
     const [trajets, setTrajets] = useState();
     const [loading, setLoading] = useState(true);
     const [userUid, setUserUid] = useState(null);
 
-
     const router = useRouter();
+
     // Récupérer l'UID de l'utilisateur
     useEffect(() => {
         const getUserUid = async () => {
-        try {
-            const storedUid = await AsyncStorage.getItem('userUid');
-            console.log("UID récupéré pour le header :", storedUid);
-            if (storedUid) {
-            setUserUid(storedUid);
-            } else {
-            console.log("Pas d'UID, redirection vers connexion.");
-            navigation.replace("/Login");
+            try {
+                const storedUid = await AsyncStorage.getItem('userUid');
+                console.log("UID récupéré pour le header :", storedUid);
+                if (storedUid) {
+                    setUserUid(storedUid);
+                } else {
+                    console.log("Pas d'UID, redirection vers connexion.");
+                    navigation.replace("/Login");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération de l'UID :", error);
             }
-        } catch (error) {
-            console.error("Erreur lors de la récupération de l'UID :", error);
-        }
         };
-    
+
         getUserUid();
     }, []);
 
     // Appeler getTrajets() une fois que l'UID est récupéré
     useEffect(() => {
         if (userUid) {
-        getTrajets();
+            getTrajets();
         }
     }, [userUid]);
-
-    
-
-
-
-
 
     const extractTime = (dateTime) => {
         const timeMatch = dateTime.match(/T(\d{2}:\d{2}):/);
@@ -81,7 +75,6 @@ export default function Header() {
 
     const getTrajets = async () => {
         try {
-            // console.log(`http://${API_CONFIG.ipaddress}/api/agent/getTrajetsFromUuid/${auth.currentUser.uid}`);
             console.log(`http://${API_CONFIG.ipaddress}/api/agent/getTrajetsFromUuid/${userUid}`);
             const response = await fetch(`http://${API_CONFIG.ipaddress}/api/agent/getTrajetsFromUuid/${userUid}`);
             const data = await response.json();
@@ -95,7 +88,6 @@ export default function Header() {
 
     const retrievePassenger = async (idPMR) => {
         try {
-
             const response = await fetch(`http://${API_CONFIG.ipaddress}/api/user/${idPMR}`);
             console.log(response.url);
             const data = await response.json();
@@ -126,11 +118,15 @@ export default function Header() {
                                 <View style={styles.top}>
                                     <Text style={styles.header}>{retrievePassenger(item.idPMR)}</Text>
                                     <Text style={styles.header}>{extractDate(item.departureTime)}</Text>
-                                    <Text style={styles.middleText}>{extractTime(item.departureTime)}</Text>
                                 </View>
                                 <View style={styles.middle}>
-                                    <Text style={styles.middleText}>{item.departure}</Text>
-                                    <Text style={styles.middleText}>{(item.arrival)}</Text>
+                                    <View style={styles.departureContainer}>
+                                        <Text style={styles.middleText}>{item.departure}</Text>
+                                        <Text style={styles.clock}>
+                                            <AntDesign style={styles.icon} name="clockcircleo" size={11} color="lightgray" />  {extractTime(item.departureTime)}
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.middleText}>{item.arrival}</Text>
                                 </View>
                                 <View style={styles.bottom}>
                                     <TouchableOpacity
@@ -164,6 +160,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#192031',
     },
     loadingText: {
         color: '#12B3A8',
@@ -175,7 +172,7 @@ const styles = StyleSheet.create({
         padding: 15,
         marginVertical: 8,
         marginHorizontal: 16,
-        borderRadius: 2,
+        borderRadius: 10,
         borderWidth: 0.5,
         borderColor: 'gray',
     },
@@ -192,6 +189,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+    },
+    departureContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     bottom: {
         flexDirection: 'row',
@@ -215,5 +216,18 @@ const styles = StyleSheet.create({
     middleText: {
         fontSize: 16,
         color: 'white',
+    },
+    clock: {
+        fontSize: 11,
+        color: 'lightgray',
+        padding: 5,
+        backgroundColor: '#192031',
+        borderRadius: 5,
+        marginLeft: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    icon: {
+        marginRight: 3,
     },
 });

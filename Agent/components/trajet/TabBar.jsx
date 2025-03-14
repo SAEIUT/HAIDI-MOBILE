@@ -15,7 +15,7 @@ export default function TabBar({ state, descriptors, navigation }) {
     Trajet: (props) => <Entypo name="ticket" size={26} color={secondColor} {...props} />
   }
   const primaryColor = "#12B3A8";
-  const secondColor = "#737373";
+  const secondColor = "lightgray";
   return (
     <View style={styles.tabbar}>
       {state.routes.map((route, index) => {
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#2C2C2E",
     marginHorizontal: 20,
     paddingVertical: 15,
     borderRadius: 25,

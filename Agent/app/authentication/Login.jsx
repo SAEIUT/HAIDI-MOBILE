@@ -113,14 +113,15 @@ export default function Login() {
     }
     try {
       console.log("Tentative de connexion avec :", email, password);
-      const response = await fetch(`${API_CONFIG.BASE_URL}/firebase/agent/sign-in`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}firebase/agent/sign-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
+      console.log("URL : ", response.url);
       const data = await response.json();
       console.log("Réponse de l'API :", data);
-  
+
       if (response.ok) {
         if (data.user && data.user.uid) {
           console.log("UID récupéré :", data.user.uid);
@@ -140,7 +141,7 @@ export default function Login() {
       alert("Impossible de se connecter");
     }
   };
-  
+
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -149,7 +150,7 @@ export default function Login() {
       {[...Array(20)].map((_, index) => (
         <Particle key={index} delay={index * 500} />
       ))}
-      
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           {/* Logo */}
@@ -190,7 +191,7 @@ export default function Login() {
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
 
-            
+
           </AnimatedComponent.View>
         </View>
       </ScrollView>
@@ -200,7 +201,7 @@ export default function Login() {
         <Text style={styles.copyright}>
           © 2025 C&FM. Tous droits réservés.
         </Text>
-        
+
       </View>
     </SafeAreaView>
   );

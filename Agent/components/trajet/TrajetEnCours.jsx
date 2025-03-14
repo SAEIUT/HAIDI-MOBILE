@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Modal, TextInput } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { getTrajet, retrievePassenger, changeTrajetStatue, formatDate, calculerAge, getStuff, extractTime } from "./api.js";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Entypo from '@expo/vector-icons/Entypo';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function CurrentTrajet({ idDossier, idTrajet }) {
     const [bagage, setBagage] = useState([]);
@@ -10,6 +13,8 @@ export default function CurrentTrajet({ idDossier, idTrajet }) {
     const [pmr, setPmr] = useState(null);
     const [cameraActive, setCameraActive] = useState(false);
     const [hasPermission, setHasPermission] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [problemMessage, setProblemMessage] = useState("");
     const cameraRef = useRef(null);
     const [facing, setFacing] = useState("back");
     const [permission, requestPermission] = useCameraPermissions();
@@ -56,16 +61,28 @@ export default function CurrentTrajet({ idDossier, idTrajet }) {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [idDossier, idTrajet]);
 
     const onScan = (result) => {
         if (result) {
-            console.log("QR Code detected:", result.data);
-            console.log("Trajet status:", trajet.statusValue);
-            console.log("id Dossier:", idDossier);
-            console.log("id Trajet:", idTrajet);
-            changeTrajetStatue(idDossier, idTrajet, trajet.statusValue);
-            setCameraActive(false);
+            try {
+                const qrData = JSON.parse(result.data);
+                console.log("QR Code detected:", qrData);
+                console.log("Trajet status:", trajet.statusValue);
+                console.log("id Dossier:", idDossier);
+                console.log("id Trajet:", idTrajet);
+
+                if (qrData.idTrajet === idTrajet) {
+                    changeTrajetStatue(idDossier, idTrajet, trajet.statusValue);
+                    setCameraActive(false);
+                } else {
+                    Alert.alert("QR Code invalide", "Le QR code ne correspond pas à ce trajet.");
+                    setCameraActive(false);
+                }
+            } catch (error) {
+                Alert.alert("QR Code invalide", "Le QR code ne correspond pas à ce trajet.");
+                setCameraActive(false);
+            }
         }
     };
 
@@ -79,9 +96,26 @@ export default function CurrentTrajet({ idDossier, idTrajet }) {
             "Voulez-vous continuer ?",
             [
                 { text: "Annuler", onPress: () => console.log("Cancel Pressed"), style: "cancel" },
-                { text: "Valider", onPress: () => redirect() },
+                {
+                    text: "Valider",
+                    onPress: () => {
+                        setBagage([]);
+                        setTrajet(null);
+                        setPmr(null);
+                        setCameraActive(false);
+                        setModalVisible(false);
+                        setProblemMessage("");
+                        redirect();
+                    },
+                },
             ]
         );
+    };
+
+    const sendProblemMessage = () => {
+        console.log("Problem message sent:", problemMessage);
+        setModalVisible(false);
+        setProblemMessage("");
     };
 
     if (loading) {
@@ -100,42 +134,74 @@ export default function CurrentTrajet({ idDossier, idTrajet }) {
             </View>
             <View style={styles.body}>
                 <View style={styles.bodyTop}>
-                    <Text style={styles.textTop}>Nom : {pmr.firstname + " " + pmr.lastname}</Text>
-                    <Text style={styles.textTop}>Handicape : {pmr.handicap}</Text>
+                    <Text style={styles.textTop}><Ionicons name="person" size={16} color="white" /> : {pmr?.firstname + " " + pmr?.lastname}</Text>
+                    <Text style={styles.textTop}>Handicape : <Entypo name="eye-with-line" size={16} color="white" /></Text>
                 </View>
                 <View style={styles.bodyTopMid}>
-                    <Text style={styles.textMiddle}>Age : {calculerAge(pmr.birthdate)}</Text>
-                    <Text style={styles.textMiddle}>Naissance : {formatDate(pmr.birthdate)}</Text>
+                    <Text style={styles.textMiddle}>Naissance : {formatDate(pmr?.birthdate)}</Text>
+                    <Text style={styles.textMiddle}><FontAwesome name="birthday-cake" size={16} color="white" />  Age : {calculerAge(pmr?.birthdate)}</Text>
                 </View>
 
                 <View style={styles.bagage}>
                     <Text style={styles.textBagage}>Bagage : {bagage.length}</Text>
-
                 </View>
                 <View style={styles.bodyMidBot}>
                     <View style={styles.trajetDepart}>
-                        <Text style={styles.textTrajet}>Lieu de Départ : {trajet.departure}</Text>
-                        <Text style={styles.textTrajet}>Heure : {extractTime(trajet.departureTime)}</Text>
+                        <Text style={styles.textTrajet}>Lieu de Départ : {trajet?.departure}</Text>
+                        <Text style={styles.textTrajet}>Heure : {extractTime(trajet?.departureTime)}</Text>
                     </View>
                     <View style={styles.trajetArrivee}>
-                        <Text style={styles.textTrajet}>Lieu d'Arrivée : {trajet.arrival}</Text>
-                        <Text style={styles.textTrajet}>Heure : {extractTime(trajet.arrivalTime)}</Text>
+                        <Text style={styles.textTrajet}>Lieu d'Arrivée : {trajet?.arrival}</Text>
+                        <Text style={styles.textTrajet}>Heure : {extractTime(trajet?.arrivalTime)}</Text>
                     </View>
-
                 </View>
-                <TouchableOpacity style={styles.buttonScan} onPress={() => setCameraActive(true)}><Text style={styles.scan}>Scanner le code</Text></TouchableOpacity>
-
+                <TouchableOpacity style={styles.buttonScanBagage} onPress={() => setCameraActive(true)}><Text style={styles.scan}>Scanner le code des bagages</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.buttonScan} onPress={() => setCameraActive(true)}><Text style={styles.scan}>Scanner le code du voyage</Text></TouchableOpacity>
             </View>
             <View style={styles.buttonSection}>
-                <TouchableOpacity style={styles.buttonProbleme} onPress={() => { }}><Text style={styles.probleme}>Signaler un problème ?</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.buttonProbleme} onPress={() => setModalVisible(true)}><Text style={styles.probleme}>Signaler un problème ?</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.buttonValider} onPress={() => validerTrajet()}><Text style={styles.valider}>Valider voyage</Text></TouchableOpacity>
             </View>
 
             {cameraActive && hasPermission && (
-                <CameraView style={styles.scanContainer} facing={facing} barcodeScannerSettings={{ barcodeTypes: ["qr"], }} onBarcodeScanned={onScan}>
-                    <View style={styles.scanZone} />
-                </CameraView>
+                <View style={styles.scanContainer}>
+                    <CameraView style={styles.camera} facing={facing} barcodeScannerSettings={{ barcodeTypes: ["qr"], }} onBarcodeScanned={onScan}>
+                        <View style={styles.scanZone} />
+                    </CameraView>
+                    <TouchableOpacity style={styles.closeButton} onPress={() => setCameraActive(false)}>
+                        <Ionicons name="close" size={32} color="white" />
+                    </TouchableOpacity>
+                </View>
             )}
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Signaler un problème</Text>
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="Décrivez le problème ici..."
+                            placeholderTextColor="white"
+                            value={problemMessage}
+                            onChangeText={setProblemMessage}
+                            multiline
+                        />
+                        <TouchableOpacity style={styles.modalButton} onPress={sendProblemMessage}>
+                            <Text style={styles.modalButtonText}>Envoyer</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
+                            <Text style={styles.modalCloseButtonText}>Fermer</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -144,10 +210,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
+        marginTop: 10,
     },
     header: {
         backgroundColor: '#192031',
-        padding: 10,
+        padding: 15,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -163,11 +230,13 @@ const styles = StyleSheet.create({
         borderWidth: 0.3,
         borderColor: 'gray',
         width: '95%',
-        height: '60%',
+        height: '50%',
         backgroundColor: '#2D3956',
     },
     bodyTop: {
         padding: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     bodyMiddle: {
         padding: 10,
@@ -192,6 +261,8 @@ const styles = StyleSheet.create({
     },
     bodyTopMid: {
         padding: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     trajetDepart: {
         padding: 10,
@@ -261,7 +332,13 @@ const styles = StyleSheet.create({
         left: 0,
         zIndex: 1,
     },
+    camera: {
+        width: '100%',
+        height: '100%',
+    },
     scanZone: {
+        position: 'absolute',
+        top: '35%', left: '25%',
         width: 200,
         height: 200,
         backgroundColor: 'transparent',
@@ -270,6 +347,14 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: 50,
+        padding: 10,
     },
     buttonValider: {
         borderColor: 'green',
@@ -287,5 +372,59 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
     },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: '#192031',
+        padding: 20,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: 'white',
+    },
+    modalInput: {
+        height: 100,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 20,
+        backgroundColor: '#2D3956',
+    },
+    modalButton: {
+        backgroundColor: '#12B3A8',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    modalCloseButton: {
+        marginTop: 10,
+        alignItems: 'center',
+    },
+    modalCloseButtonText: {
+        color: '#df6058',
+        fontWeight: 'bold',
+    },
 
+    buttonScanBagage: {
+        backgroundColor: 'gray',
+        padding: 10,
+        borderRadius: 2,
+        margin: 10,
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignSelf: 'center',
+    },
 });

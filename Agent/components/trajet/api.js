@@ -11,7 +11,7 @@ export const getTrajet = async (idDossier, idTrajet) => {
         const data = await response.json();
         if (response.ok) {
             console.log(data);
-            return data; 
+            return data;
         } else {
             console.error("Erreur de récupération du trajet :", data);
             throw new Error(data);
@@ -23,13 +23,13 @@ export const getTrajet = async (idDossier, idTrajet) => {
 };
 
 export const getStuff = async (idDossier) => {
-     try {
+    try {
         const response = await fetch(`http://${API_CONFIG.ipaddress}/api/reservation/${idDossier}`);
         console.log(response.url);
         const data = await response.json();
         if (response.ok) {
             console.log(data);
-            return data; 
+            return data;
         } else {
             console.error("Erreur de récupération du trajet :", data);
             throw new Error(data);
@@ -46,7 +46,7 @@ export const retrievePassenger = async (idPMR) => {
         const response = await fetch(`http://${API_CONFIG.ipaddress}/api/user/${idPMR}`);
         const data = await response.json();
         console.log(data);
-        return data; 
+        return data;
     } catch (error) {
         console.error("Erreur lors de la récupération du passager :", error);
         throw error;
@@ -55,12 +55,12 @@ export const retrievePassenger = async (idPMR) => {
 
 
 export const changeTrajetStatue = async (idDossier, idTrajet, status) => {
-        console.log("idDossier", idDossier);
-        console.log("idTrajet", idTrajet);
-        console.log("status", status);
+    console.log("idDossier", idDossier);
+    console.log("idTrajet", idTrajet);
+    console.log("status", status);
     try {
         let endpoint;
-       
+
         if (status === 0) {
             endpoint = `http://${API_CONFIG.ipaddress}/api/reservation/setOngoing/${idDossier}/${idTrajet}`;
         } else if (status === 1) {
@@ -83,8 +83,14 @@ export const changeTrajetStatue = async (idDossier, idTrajet, status) => {
 };
 
 export const formatDate = (date) => {
-    const [year, month, day] = date.split("-");
-    return `${day}/${month}/${year}`;
+    try {
+        const [year, month, day] = date.split("-");
+        return `${day}/${month}/${year}`;
+    }
+    catch (error) {
+        console.error("Erreur dans formatDate :", error);
+        return "Date inconnue";
+    }
 };
 
 
@@ -104,9 +110,16 @@ export const calculerAge = (dateNaissance) => {
 }
 
 export const extractTime = (dateTime) => {
+    try {
         const timeMatch = dateTime.match(/T(\d{2}:\d{2}):/);
         if (timeMatch) {
             return timeMatch[1];
         }
         return 'Heure inconnue';
-    };
+    }
+    catch (error) {
+        console.error("Erreur dans extractTime :", error);
+        return "Heure inconnue";
+    }
+
+};
