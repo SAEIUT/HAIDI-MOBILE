@@ -1,75 +1,90 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import Password from './Password'; // Assurez-vous que ce fichier existe
 
-const EditProfile = ({ editedProfile, onChange, onSave, onCancel }) => {
+const EditProfile = ({ editedProfile, onChange, onSave, onCancel, passwords }) => {
+  const [showPasswordPage, setShowPasswordPage] = useState(false);
+
+
+
   return (
-    <View style={styles.profileContainer}>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Prénom</Text>
-        <TextInput
-          style={styles.input}
-          value={editedProfile.firstName}
-          onChangeText={(text) => onChange({ ...editedProfile, firstName: text })}
-          placeholder="Entrez votre prénom"
-          placeholderTextColor="#888"
+    <>
+
+      {showPasswordPage ? (
+        <Password
+          passwords={passwords}
+          onChange={onChange}
+          onSave={() => {
+            onSave();
+            setShowPasswordPage(false); // Fermer la page après la sauvegarde
+          }}
+          onCancel={() => setShowPasswordPage(false)} // Fermer la page sans sauvegarder
         />
-      </View>
+      ) : (
+        <View style={styles.profileContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Prénom</Text>
+            <TextInput
+              style={styles.input}
+              value={editedProfile.firstName}
+              onChangeText={(text) => onChange({ ...editedProfile, firstName: text })}
+              placeholder="Entrez votre prénom"
+              placeholderTextColor="#888"
+            />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Nom</Text>
-        <TextInput
-          style={styles.input}
-          value={editedProfile.lastName}
-          onChangeText={(text) => onChange({ ...editedProfile, lastName: text })}
-          placeholder="Entrez votre nom"
-          placeholderTextColor="#888"
-        />
-      </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Nom</Text>
+            <TextInput
+              style={styles.input}
+              value={editedProfile.lastName}
+              onChangeText={(text) => onChange({ ...editedProfile, lastName: text })}
+              placeholder="Entrez votre nom"
+              placeholderTextColor="#888"
+            />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={editedProfile.email}
-          onChangeText={(text) => onChange({ ...editedProfile, email: text })}
-          placeholder="Entrez votre email"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
-        />
-      </View>
+          {/* <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={editedProfile.email}
+              onChangeText={(text) => onChange({ ...editedProfile, email: text })}
+              placeholder="Entrez votre email"
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+            />
+          </View> */}
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Téléphone</Text>
-        <TextInput
-          style={styles.input}
-          value={editedProfile.tel}
-          onChangeText={(text) => onChange({ ...editedProfile, tel: text })}
-          placeholder="Entrez votre téléphone"
-          placeholderTextColor="#888"
-          keyboardType="phone-pad"
-        />
-      </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Téléphone</Text>
+            <TextInput
+              style={styles.input}
+              value={editedProfile.tel}
+              onChangeText={(text) => onChange({ ...editedProfile, tel: text })}
+              placeholder="Entrez votre téléphone"
+              placeholderTextColor="#888"
+              keyboardType="phone-pad"
+            />
+          </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Mot de passe</Text>
-        <TextInput
-          style={styles.input}
-          value={editedProfile.password}
-          onChangeText={(text) => onChange({ ...editedProfile, password: text })}
-          placeholder="Entrez un nouveau mot de passe"
-          placeholderTextColor="#888"
-          secureTextEntry
-        />
-      </View>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={() => setShowPasswordPage(true)} // Afficher la page Password
+          >
+            <Text style={styles.buttonText}>Modifier votre mot de passe</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={onSave}>
-        <Text style={styles.buttonText}>Sauvegarder</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={onSave}>
+            <Text style={styles.buttonText}>Sauvegarder</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onCancel}>
-        <Text style={styles.buttonText}>Annuler</Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onCancel}>
+            <Text style={styles.buttonText}>Annuler</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </>
   );
 };
 

@@ -6,13 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PhotoContext } from '../Photos/PhotoContext2';
 import EditProfile from './EditProfile';
 import { API_CONFIG } from '../../constants/API_CONFIG';
-import Profil from '../home/Profil';
 
 const ProfileScreen = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
+  const [passwords, setPasswords] = useState({});
   const router = useRouter();
   const [id, setId] = useState(null);
   const { photo, setPhoto } = React.useContext(PhotoContext);
@@ -47,6 +47,8 @@ const ProfileScreen = () => {
 
         console.log("Modification MongoDB :", responseData2);
         console.log("Modification Firebase :", responseData);
+        console.log("voici le mot de passe : ", passwords);
+
         setId(responseData2.id);
 
         // console.log("id qu'on veut " , id);
@@ -59,15 +61,16 @@ const ProfileScreen = () => {
 
         
         console.log("mes jeux des données : " , responseData);
-        console.log("Prénom :", responseData.user.firstname);
 
         setEditedProfile({
           firstName: responseData.user.firstName || responseData.user.firstname ,
           lastName: responseData.user.lastName || responseData.user.lastname,
-          email: responseData.user.Email || responseData.user.email,
           tel: responseData.user.Tel,
-          password: '',
         });
+
+        setPasswords({
+          password: '',
+        })
       } catch (error) {
         Alert.alert('Erreur', 'Une erreur est survenue lors du chargement du profil.');
       } finally {
@@ -298,12 +301,6 @@ const ProfileScreen = () => {
         </View>
       </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.valueContainer}>
-          <Text style={styles.value}>{profile.email}</Text>
-        </View>
-      </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Téléphone</Text>
